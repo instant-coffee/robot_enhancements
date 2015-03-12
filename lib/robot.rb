@@ -10,8 +10,18 @@ class Robot
     @equipped_weapon = nil
   end
 
+  def in_range?(enemy)
+    if ( (enemy.position[1] - @position[1]).abs <= 1) && ((enemy.position[0] - @position[0]).abs <= 1)
+      true
+    else
+      false
+    end
+  end
+
   def attack(enemy)
-    @equipped_weapon ? @equipped_weapon.hit(enemy) : enemy.wound(5)
+    if in_range?(enemy)
+      @equipped_weapon ? @equipped_weapon.hit(enemy) : enemy.wound(5)
+    end
   end
 
   def wound(hit_points)
@@ -21,11 +31,12 @@ class Robot
 
   def heal!
     if @health <= 0
-      raise Exception
+      raise RobotAlreadyDeadError
         puts "Error this robot is dead and cannot be revived"
     else
       @health += health_kit
       @health = 100 if @health > 100
+    end
   end
 
   def heal(health_kit)
@@ -53,8 +64,15 @@ class Robot
     @items.inject(0) {|sum, i| sum += i.weight }
   end
 
+  def auto_heal(item)
+    if ( @health <= 80 ) && ( item.is_a? BoxOfBolts )
+      item.feed(self) 
+    end
+  end
+
   def pick_up(item)
     if(items_weight + item.weight) <= @capacity
+      auto_heal(item)
       @equipped_weapon  = item if item.is_a? Weapon
       @items << item 
     end 
