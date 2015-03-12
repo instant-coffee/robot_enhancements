@@ -18,7 +18,23 @@ class Robot
     end
   end
 
+  def in_grenade_range?(enemy)
+    if ( (enemy.position[1] - @position[1]).abs <= 2) && ((enemy.position[0] - @position[0]).abs <= 2)
+      true
+    else
+      false
+    end
+  end
+
+  def grenade_attack(enemy)
+    if in_grenade_range?(enemy)
+      @equipped_weapon.hit(enemy)
+    end
+    @equipped_weapon = nil
+  end
+
   def attack(enemy)
+    grenade_attack(enemy) if @equipped_weapon.is_a?( Grenade )
     if in_range?(enemy)
       @equipped_weapon ? @equipped_weapon.hit(enemy) : enemy.wound(5)
     end

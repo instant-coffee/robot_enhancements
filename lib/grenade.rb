@@ -1,5 +1,7 @@
 class  Grenade < Weapon
+  
   def initialize
-  super
+  super( "Grenade", 40, 15 ,2)
   end
+
 end
